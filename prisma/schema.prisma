@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId     
+  email    String
+  password  String
+  userId   String
+  firstName  String ?
+  lastName   String ?
+  profilePic String ?
+  mobile     String
+  socialLinks   Social?
+  skills      Skill[] 
+  userType    Usertype
+  jobsApplied   AppliedBy[]  @relation("AppliedbyToUser")
+  educations  Education?
+  experiences  Experience[] @relation("UserToexperince")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+enum Usertype {
+     Intern
+     JobSeeker
+}
+type Social{
+  linkedIn String
+  GitHub   String
+  YouTube   String?
+  portfolio  String?
+  
+}
+
+model Skill{
+   id     String   @id @default(auto()) @map("_id") @db.ObjectId
+   name String
+  jobId   String?
+  userId  String?
+  job     Job?     @relation(fields: [jobId], references: [id])
+  user    User?    @relation(fields: [userId], references: [id])
+}
+
+type Education{
+  highQuali  String
+  passedOut  String
+}
+
+model Experience{
+   id           String    @id @default(auto()) @map("_id") @db.ObjectId  
+   userId      String
+   user        User   @relation("UserToexperince", fields: [userId],references: [id])
+   role        String
+   experiences String
+   companyName String
+   createdAt DateTime @default(now())
+}
+
+type Address {
+
+  street String
+  city   String
+  state  String
+  zip    String
+
+}
+
+model Employer {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId   
+  name     String    
+  email    String
+  password  String
+  userId   String
+  about    String?
+  profilePic  String ?
+  address     Address?
+  socialLinks  Social?
+  jobs  Job[]  @relation("EmployerToJobs")
+  createdAt DateTime @default(now())
+
+}
+
+enum JobType{
+    Intern
+    Fulltime
+}
+
+
+model Job{
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId 
+  title    String
+  experience  String
+  employerId     String    
+  employer       Employer    @relation("EmployerToJobs", fields: [employerId], references: [id])
+  description  String
+  skills      Skill[]  
+  expired    Boolean @default(false)
+  appliedBy   AppliedBy[]  @relation("JobsToAppliedBy")
+  jobType  JobType
+  createdAt DateTime @default(now())
+}
+
+model AppliedBy{
+    id       String    @id @default(auto()) @map("_id") @db.ObjectId 
+    jobId String
+    job   Job   @relation("JobsToAppliedBy", fields: [jobId], references: [id])
+    userId String
+    user  User @relation("AppliedbyToUser",fields: [userId],references: [id])
+    createdAt DateTime @default(now())
+}
