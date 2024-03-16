@@ -4,7 +4,7 @@ import Prisma from "@/lib/index";
 import { auth } from "@clerk/nextjs"
 import { NextResponse } from "next/server"
 
-export const PATCH =async({req:company_id})=>{
+export const PATCH =async(req,res,company_id)=>{
     try {
         const {userId} = auth();
         if(!userId){
@@ -12,9 +12,9 @@ export const PATCH =async({req:company_id})=>{
         }
         const company_id = req.params;
 
-        const {name,email,password,about ,profilePic,websiteUrl,gitUrl,address}= req.body;
+        const {name,email,about ,profilePic,websiteUrl,gitUrl,linkedInUrl,address}= req.body;
        
-        if(!name || !email || !password || !about || !profilePic || !websiteUrl || !gitUrl || !address ){
+        if(!name || !email || !linkedInUrl || !about || !profilePic || !websiteUrl || !gitUrl || !address ){
         return new NextResponse(`all fields are required to update`)
        }
         const User = await Prisma.employer.findUnique({
@@ -35,13 +35,13 @@ export const PATCH =async({req:company_id})=>{
             data:{
                 name,
                 email,
-                password,
                 about,
                 address,
                 profilePic,
                 socialLinks:{
                     portfolio:websiteUrl,
-                    GitHub:gitUrl
+                    GitHub:gitUrl,
+                    linkedIn:linkedInUrl
                 }
             }
         });

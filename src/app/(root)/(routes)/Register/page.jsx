@@ -30,6 +30,14 @@ export default function Form() {
   const [showTeacherComponent, setShowTeacherComponent] = useState(true);
 
 
+  const Fetch =async()=>{
+   await axios.get('/api/employer')
+   .then(()=>{
+    console.log(" im clicked")
+   }) .catch((e)=>{
+    console.log(e.message)
+  })  
+  }
 
  // watch input value by passing the name of it
  
@@ -40,7 +48,7 @@ export default function Form() {
    
      const handleEmployerFormSubmit = async(data) => {
       await axios.post('/api/employer',data)
-      // await axios.delete('/api/employer',data)
+     
 
       .then(()=>{
         console.log("form submitted")
@@ -51,6 +59,7 @@ export default function Form() {
       })    
      };
   return (
+    <>
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
 <form onSubmit={handleSubmit(role === 'user' ? handleUserFormSubmit : handleEmployerFormSubmit)}>
 
@@ -114,6 +123,10 @@ export default function Form() {
       </div>
   
   <button type="submit">Submit</button>
+
+  
     </form>
+    <button onClick={()=>Fetch}>Fetch</button>
+  </>
   )
 }

@@ -4,19 +4,24 @@ import  Prisma from '@/lib/index'
 
 export const POST =async()=>{
     try {
-        const {userId} = auth();
+        const {user} = auth();
 
-        const {firstName,lastName,email,password,phone} = req.body;
+
+        const {firstName,lastName,email,phone} = req.body;
 
         console.log(firstName,lastName,email)
 
-        if(!firstName || !lastName || !email || !password || !phone){
+        if(!firstName || !lastName || !email  || !phone){
             return new NextResponse("all the fields must be fill", {status:400})
         }
         const userExist = await Prisma.user.findUnique({
             where:{
-                userId:userId
-            }
+               id:user.id,
+               email:user.emailAddresses.email | email,
+               phone:user.phoneNumbers.phone  | phone,
+               firstName:user.firstName | firstName,
+               lastName:user.lastName | lastName
+               }
         })
 
         if(userExist){
@@ -48,6 +53,10 @@ export const GET = async()=>{
 
     try {
         const {userId} = auth();
+
+        if(!userId){
+            return new NextResponse("un- authorized access")
+        }
 
     const Users = await Prisma.user.findMany({});
      return NextResponse.json(Users)
